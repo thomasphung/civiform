@@ -49,7 +49,7 @@ public class ProgramBlockEditView extends BaseHtmlView {
   }
 
   private Tag title(ProgramDefinition program) {
-    return h1(program.name() + " Questions");
+    return h1(program.name() + " Questions").withClasses(Styles.W_SCREEN, Styles.BG_GRAY_500, Styles.P_2, Styles.TEXT_LG, Styles.TEXT_WHITE);
   }
 
   private ContainerTag topButtons(Tag csrfTag, ProgramDefinition program) {
