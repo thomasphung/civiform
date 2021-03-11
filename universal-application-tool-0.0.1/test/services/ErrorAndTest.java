@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 public class ErrorAndTest {
   @Test
@@ -38,5 +39,14 @@ public class ErrorAndTest {
     assertThat(errorAndResult.getResult()).isEqualTo("result");
     assertThat(errorAndResult.isError()).isFalse();
     assertThat(errorAndResult.getErrors()).isEmpty();
+  }
+
+  @Test
+  public void resultIsImmutableSet() {
+    ImmutableSet<String> result = ImmutableSet.of("a", "b", "c");
+    ErrorAnd<ImmutableSet<String>, String> errorAndResult = new ErrorAnd<>(result);
+
+    assertThat(errorAndResult.hasResult()).isTrue();
+    assertThat(errorAndResult.isError()).isFalse();
   }
 }
