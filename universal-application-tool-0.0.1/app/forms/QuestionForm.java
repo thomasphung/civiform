@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Locale;
+import java.util.OptionalInt;
+
 import services.Path;
 import services.question.InvalidQuestionTypeException;
 import services.question.QuestionDefinition;
@@ -18,6 +20,8 @@ public class QuestionForm {
   private String questionType;
   private String questionText;
   private String questionHelpText;
+  private OptionalInt textMinLength;
+  private OptionalInt textMaxLength;
 
   public QuestionForm() {
     questionName = "";
@@ -93,6 +97,22 @@ public class QuestionForm {
 
   public void setQuestionHelpText(String questionHelpText) {
     this.questionHelpText = checkNotNull(questionHelpText);
+  }
+
+  public OptionalInt getTextMinLength() {
+    return textMinLength;
+  }
+
+  public void setTextMinLength(int textMinLength) {
+    this.textMinLength = OptionalInt.of(textMinLength);
+  }
+
+  public OptionalInt getTextMaxLength() {
+    return textMaxLength;
+  }
+
+  public void setTextMaxLength(int textMaxLength) {
+    this.textMaxLength = OptionalInt.of(textMaxLength);
   }
 
   public QuestionDefinitionBuilder getBuilder() throws InvalidQuestionTypeException {
