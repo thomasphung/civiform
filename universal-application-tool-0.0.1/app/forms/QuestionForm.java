@@ -5,12 +5,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import java.util.Locale;
 import java.util.OptionalInt;
-
 import services.Path;
 import services.question.InvalidQuestionTypeException;
 import services.question.QuestionDefinition;
 import services.question.QuestionDefinitionBuilder;
 import services.question.QuestionType;
+import services.question.TextQuestionDefinition;
 import services.question.TranslationNotFoundException;
 
 public class QuestionForm {
@@ -30,6 +30,8 @@ public class QuestionForm {
     questionType = "TEXT";
     questionText = "";
     questionHelpText = "";
+    textMinLength = OptionalInt.empty();
+    textMaxLength = OptionalInt.empty();
   }
 
   public QuestionForm(QuestionDefinition qd) {
@@ -37,6 +39,14 @@ public class QuestionForm {
     questionDescription = qd.getDescription();
     questionPath = qd.getPath();
     questionType = qd.getQuestionType().name();
+
+    if (qd.getQuestionType() == QuestionType.TEXT) {
+      textMinLength = ((TextQuestionDefinition) qd).getMinLength();
+      textMaxLength = ((TextQuestionDefinition) qd).getMaxLength();
+    } else {
+      textMinLength = OptionalInt.empty();
+      textMaxLength = OptionalInt.empty();
+    }
 
     try {
       questionText = qd.getQuestionText(Locale.US);

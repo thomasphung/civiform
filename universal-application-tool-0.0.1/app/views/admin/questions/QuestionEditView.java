@@ -112,7 +112,24 @@ public final class QuestionEditView extends BaseHtmlView {
                 .setPlaceholderText("The question help text displayed to the applicant")
                 .setValue(questionForm.getQuestionText())
                 .getContainer())
-        .with(formQuestionTypeSelect(QuestionType.valueOf(questionForm.getQuestionType())));
+        .with(formQuestionTypeSelect(QuestionType.valueOf(questionForm.getQuestionType())))
+        .condWith(
+            questionForm.getQuestionType().equals("TEXT"),
+            FieldWithLabel.number()
+                .setId("text-min-length")
+                .setLabelText("Minimum length (optional)")
+                .setValue(questionForm.getTextMinLength())
+                .getContainer())
+        .condWith(
+            questionForm.getQuestionType().equals("TEXT"),
+            FieldWithLabel.number()
+                .setId("text-max-length")
+                .setLabelText("Maximum length (optional)")
+                .setValue(questionForm.getTextMaxLength())
+                .getContainer());
+
+    // TODO: the condWith condition doesn't actually update live - it just takes the snapshot of
+    //  the question type at the time of rendering.
 
     return formTag;
   }
@@ -120,7 +137,7 @@ public final class QuestionEditView extends BaseHtmlView {
   private DomContent formQuestionTypeSelect(QuestionType selectedType) {
     ImmutableList<SimpleEntry<String, String>> options =
         Arrays.stream(QuestionType.values())
-            .map(item -> new SimpleEntry<String, String>(item.toString(), item.name()))
+            .map(item -> new SimpleEntry<>(item.toString(), item.name()))
             .collect(ImmutableList.toImmutableList());
 
     return new SelectWithLabel()

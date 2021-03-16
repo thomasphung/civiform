@@ -8,6 +8,8 @@ import j2html.TagCreator;
 import j2html.attributes.Attr;
 import j2html.tags.ContainerTag;
 import j2html.tags.Tag;
+
+import java.util.OptionalInt;
 import views.BaseStyles;
 import views.Styles;
 
@@ -34,10 +36,12 @@ public class FieldWithLabel {
 
   protected Tag fieldTag;
   protected String fieldValue = "";
+  protected int numberFieldValue;
   protected String formId = "";
   protected String labelText = "";
   protected String placeholderText = "";
   protected String id = "";
+  protected String type;
 
   public FieldWithLabel(Tag fieldTag) {
     this.fieldTag = fieldTag.withClasses(FieldWithLabel.CORE_FIELD_CLASSES);
@@ -45,7 +49,16 @@ public class FieldWithLabel {
 
   public static FieldWithLabel input() {
     Tag fieldTag = TagCreator.input().withType("text");
-    return new FieldWithLabel(fieldTag);
+    FieldWithLabel result = new FieldWithLabel(fieldTag);
+    result.type = "text";
+    return result;
+  }
+
+  public static FieldWithLabel number() {
+    Tag fieldTag = TagCreator.input().withType("number");
+    FieldWithLabel result = new FieldWithLabel(fieldTag);
+    result.type = "number";
+    return result;
   }
 
   public static FieldWithLabel textArea() {
@@ -75,6 +88,13 @@ public class FieldWithLabel {
 
   public FieldWithLabel setValue(String value) {
     this.fieldValue = value;
+    return this;
+  }
+
+  public FieldWithLabel setValue(OptionalInt value) {
+    if (value.isPresent()) {
+      this.numberFieldValue = value.getAsInt();
+    }
     return this;
   }
 

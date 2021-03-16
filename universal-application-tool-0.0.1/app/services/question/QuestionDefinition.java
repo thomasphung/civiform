@@ -131,7 +131,7 @@ public abstract class QuestionDefinition {
   /** Validate that all required fields are present and valid for the question. */
   public ImmutableSet<QuestionServiceError> validate() {
     ImmutableSet.Builder<QuestionServiceError> errors =
-        new ImmutableSet.Builder<QuestionServiceError>();
+        new ImmutableSet.Builder<>();
     if (version < 1) {
       errors.add(QuestionServiceError.of(String.format("invalid version: %d", version)));
     }
