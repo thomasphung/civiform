@@ -11,7 +11,7 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
-    "marked": "^2.0.3",
+    "easymde": "^2.15.0",
     "tailwindcss": "^2.0.3"
   },
   "dependencies": {}
