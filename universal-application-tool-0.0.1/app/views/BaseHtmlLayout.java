@@ -39,6 +39,7 @@ public class BaseHtmlLayout extends BaseHtmlView {
     contents.add(0, privacyBanner.getContainerTag());
     contents.add(viewUtils.makeLocalJsTag("toast"));
     contents.add(viewUtils.makeLocalJsTag("radio"));
+    contents.add(viewUtils.makeLocalJsTag("markdown-editor"));
     return new HtmlResponseContent(contents.toArray(new DomContent[0]));
   }
 
