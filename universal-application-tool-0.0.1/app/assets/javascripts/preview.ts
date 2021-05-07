@@ -1,4 +1,5 @@
-/** The preview controller is responsible for updating quesiton preview text in the question builder. */
+
+/** The preview controller is responsible for updating question preview text in the question builder. */
 class PreviewController {
   static readonly QUESTION_TEXT_INPUT_ID = 'question-text-textarea';
   static readonly QUESTION_HELP_TEXT_INPUT_ID = 'question-help-text-textarea';
