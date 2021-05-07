@@ -8,14 +8,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import models.Applicant;
+import models.Application;
 import play.libs.concurrent.HttpExecutionContext;
 import repository.UserRepository;
 import services.ErrorAnd;
@@ -73,6 +74,14 @@ public class ApplicantServiceImpl implements ApplicantService {
   }
 
   @Override
+  public CompletionStage<ReadOnlyApplicantProgramService> getReadOnlyApplicantProgramService(
+      Application application) {
+    return CompletableFuture.completedFuture(
+        new ReadOnlyApplicantProgramServiceImpl(
+            application.getApplicantData(), application.getProgram().getProgramDefinition()));
+  }
+
+  @Override
   public CompletionStage<ErrorAnd<ReadOnlyApplicantProgramService, Exception>>
       stageAndUpdateIfValid(
           long applicantId,
@@ -86,18 +95,10 @@ public class ApplicantServiceImpl implements ApplicantService {
 
     // Ensures updates do not collide with metadata scalars. "keyName[]" collides with "keyName".
     boolean updatePathsContainReservedKeys =
-        !Sets.intersection(
-                Scalar.getMetadataScalarKeys(),
-                updates.stream()
-                    .map(
-                        update -> {
-                          if (update.path().isArrayElement()) {
-                            return update.path().withoutArrayReference().keyName();
-                          }
-                          return update.path().keyName();
-                        })
-                    .collect(Collectors.toSet()))
-            .isEmpty();
+        updates.stream()
+            .map(Update::path)
+            .map(path -> path.isArrayElement() ? path.withoutArrayReference() : path)
+            .anyMatch(path -> Scalar.getMetadataScalarKeys().contains(path.keyName()));
     if (updatePathsContainReservedKeys) {
       return CompletableFuture.failedFuture(
           new IllegalArgumentException("Path contained reserved scalar key"));
@@ -285,18 +286,28 @@ public class ApplicantServiceImpl implements ApplicantService {
       ImmutableSet<Update> updates)
       throws UnsupportedScalarTypeException, PathNotInBlockException {
     ImmutableSet.Builder<Path> questionPaths = ImmutableSet.builder();
+    ArrayList<Path> visitedPaths = new ArrayList<>();
     for (Update update : updates) {
+      Path currentPath = update.path();
+
+      // If we're updating an array we need to clear it first.
+      if (currentPath.isArrayElement()
+          && !visitedPaths.contains(currentPath.withoutArrayReference())) {
+        visitedPaths.add(currentPath.withoutArrayReference());
+        applicantData.maybeClearArray(currentPath);
+      }
+
       ScalarType type =
           block
-              .getScalarType(update.path())
-              .orElseThrow(() -> new PathNotInBlockException(block.getId(), update.path()));
-      questionPaths.add(update.path().parentPath());
+              .getScalarType(currentPath)
+              .orElseThrow(() -> new PathNotInBlockException(block.getId(), currentPath));
+      questionPaths.add(currentPath.parentPath());
       switch (type) {
         case STRING:
-          applicantData.putString(update.path(), update.value());
+          applicantData.putString(currentPath, update.value());
           break;
         case LONG:
-          applicantData.putLong(update.path(), update.value());
+          applicantData.putLong(currentPath, update.value());
           break;
         default:
           throw new UnsupportedScalarTypeException(type);

@@ -75,7 +75,9 @@ public abstract class BlockDefinition {
    *
    * @return the BlockDefinition ID for this block definitions enumerator, if it exists
    */
-  @JsonProperty("enumeratorId")
+  // TODO(https://github.com/seattle-uat/civiform/issues/993): migrate and then rename repeaterId
+  //  to enumeratorId
+  @JsonProperty("repeaterId")
   public abstract Optional<Long> enumeratorId();
 
   /**
@@ -95,6 +97,17 @@ public abstract class BlockDefinition {
     }
     throw new RuntimeException(
         "Only an enumerator block can have an enumeration question definition.");
+  }
+
+  @JsonIgnore
+  @Memoized
+  public boolean isFileUpload() {
+    // Though `anyMatch` is used here, fileupload block definitions should only ever have a single
+    // question, which is a fileupload question.
+    return programQuestionDefinitions().stream()
+        .map(ProgramQuestionDefinition::getQuestionDefinition)
+        .map(QuestionDefinition::getQuestionType)
+        .anyMatch(questionType -> questionType.equals(QuestionType.FILEUPLOAD));
   }
 
   /** A {@link Predicate} that determines whether this is hidden or shown. */
@@ -135,7 +148,9 @@ public abstract class BlockDefinition {
     @JsonProperty("description")
     public abstract Builder setDescription(String value);
 
-    @JsonProperty("enumeratorId")
+    // TODO(https://github.com/seattle-uat/civiform/issues/993): migrate and then rename repeaterId
+    //  to enumeratorId
+    @JsonProperty("repeaterId")
     public abstract Builder setEnumeratorId(Optional<Long> enumeratorId);
 
     @JsonProperty("hidePredicate")

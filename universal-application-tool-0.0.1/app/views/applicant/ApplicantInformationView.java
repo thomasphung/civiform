@@ -16,6 +16,7 @@ import play.i18n.Langs;
 import play.i18n.Messages;
 import play.mvc.Http;
 import play.twirl.api.Content;
+import services.MessageKey;
 import views.BaseHtmlView;
 import views.components.SelectWithLabel;
 
@@ -39,13 +40,14 @@ public class ApplicantInformationView extends BaseHtmlView {
   public Content render(Http.Request request, Messages messages, long applicantId) {
     String formAction = routes.ApplicantInformationController.update(applicantId).url();
     return layout.render(
+        request,
         messages,
         form()
             .withAction(formAction)
             .withMethod(Http.HttpVerbs.POST)
             .with(makeCsrfTokenInputTag(request))
             .with(selectLanguageDropdown(messages))
-            .with(submitButton("Submit")));
+            .with(submitButton(messages.at(MessageKey.BUTTON_UNTRANSLATED_SUBMIT.getKeyName()))));
   }
 
   private ContainerTag selectLanguageDropdown(Messages messages) {
@@ -63,7 +65,9 @@ public class ApplicantInformationView extends BaseHtmlView {
                                 formatLabel(locale), locale.toLanguageTag()))
                     .collect(toImmutableList()));
 
-    return div().with(p(messages.at("content.selectLanguage"))).with(languageSelect.getContainer());
+    return div()
+        .with(p(messages.at(MessageKey.CONTENT_SELECT_LANGUAGE.getKeyName())))
+        .with(languageSelect.getContainer());
   }
 
   /**

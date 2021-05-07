@@ -12,7 +12,9 @@ import java.util.Locale;
 import java.util.Optional;
 import javax.inject.Inject;
 import play.i18n.Messages;
+import play.mvc.Http;
 import play.twirl.api.Content;
+import services.MessageKey;
 import services.program.ProgramDefinition;
 import views.BaseHtmlView;
 import views.components.ToastMessage;
@@ -43,6 +45,7 @@ public class ProgramIndexView extends BaseHtmlView {
    */
   public Content render(
       Messages messages,
+      Http.Request request,
       long applicantId,
       ImmutableList<ProgramDefinition> programs,
       Optional<String> banner) {
@@ -52,10 +55,12 @@ public class ProgramIndexView extends BaseHtmlView {
       body.with(ToastMessage.alert(banner.get()).getContainerTag());
     }
     body.with(
-        topContent(messages.at("content.benefits"), messages.at("content.description")),
+        topContent(
+            messages.at(MessageKey.CONTENT_GET_BENEFITS.getKeyName()),
+            messages.at(MessageKey.CONTENT_CIVIFORM_DESCRIPTION.getKeyName())),
         mainContent(messages, programs, applicantId, messages.lang().toLocale()));
 
-    return layout.render(messages, body);
+    return layout.render(request, messages, body);
   }
 
   private ContainerTag topContent(String titleText, String infoText) {
@@ -110,7 +115,7 @@ public class ProgramIndexView extends BaseHtmlView {
                         Styles.ROUNDED_FULL,
                         Styles.INLINE_BLOCK,
                         Styles.ALIGN_MIDDLE),
-                div(messages.at("content.noCategory"))
+                div(messages.at(MessageKey.CONTENT_NO_CATEGORY.getKeyName()))
                     .withClasses(
                         Styles.ML_2,
                         Styles.INLINE,
@@ -133,7 +138,7 @@ public class ProgramIndexView extends BaseHtmlView {
         div()
             .withId(baseId + "-external-link")
             .withClasses(Styles.TEXT_XS, Styles.UNDERLINE)
-            .withText(messages.at("content.programDetails"));
+            .withText(messages.at(MessageKey.CONTENT_PROGRAM_DETAILS.getKeyName()));
     ContainerTag programData =
         div()
             .withId(baseId + "-data")
@@ -145,7 +150,7 @@ public class ProgramIndexView extends BaseHtmlView {
             .url();
     ContainerTag applyButton =
         a().attr(HREF, applyUrl)
-            .withText(messages.at("button.apply"))
+            .withText(messages.at(MessageKey.BUTTON_APPLY.getKeyName()))
             .withId(baseId + "-apply")
             .withClasses(
                 ReferenceClasses.APPLY_BUTTON,
